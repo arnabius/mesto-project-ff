@@ -1,4 +1,4 @@
-import './pages/index.css'; // добавьте импорт главного файла стилей
+import './pages/index.css'; // добавим импорт главного файла стилей
 import { initialCards } from './cards.js'
 import { createCard, deleteCard, likeCard } from './components/card.js'
 import { openModal, closeModal } from './components/modal.js'
@@ -21,13 +21,6 @@ popups.forEach(popup => {
   popup.addEventListener('click', function (evt) {
     if (evt.target.classList.contains('popup__close') || evt.target.classList.contains('popup')) { 
       closeModal(popup);
-      
-      // Очистим поля формы
-      const openedForm = popup.querySelector('.popup__form');
-      
-      if (openedForm !== null) {
-        openedForm.reset();
-      }
     }
   });
 });
@@ -37,10 +30,36 @@ popups.forEach(popup => {
 const addButton = document.querySelector('.profile__add-button');
 // Попап добавления карточки
 const addPopup = document.querySelector('.popup_type_new-card');
+// Форма добавления новой карточки
+const formNewCard = addPopup.querySelector('.popup__form'); 
+// Находим поля формы добавления новой карточки
+const nameNewCard = formNewCard.querySelector('.popup__input_type_card-name'); 
+const linkNewCard = formNewCard.querySelector('.popup__input_type_url'); 
+
 // Слушатель нажатия на кнопку "Добавить карточку"
 addButton.addEventListener('click', function (evt) {
+  formNewCard.reset();
   openModal(addPopup);
 });
+
+// Сохранение новой карточки
+// Обработчик «отправки» формы добавления новой карточки
+function handleFormNewCardSubmit(evt) {
+    evt.preventDefault(); 
+
+    const cards = {
+      name: nameNewCard.value,
+      link: linkNewCard.value,
+    } 
+
+    const cardObject = createCard(cards, deleteCard, openCard, likeCard);
+    cardList.prepend(cardObject);
+
+    closeModal(addPopup);
+}
+
+// Слушатель отправки формы добавления новой карточки
+formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 
 
 // Кнопка редактирования профиля
@@ -63,7 +82,6 @@ editButton.addEventListener('click', function () {
   openModal(editPopup);
 });
 
-
 // Сохранение данных профиля
 // Находим поля формы попапа в DOM
 const nameInput = formEdit.querySelector('.popup__input_type_name'); 
@@ -77,41 +95,12 @@ function handleFormProfileSubmit(evt) {
     elemProfileTitle.textContent = nameInput.value;
     elemProfileDescription.textContent = jobInput.value;
 
-    const openedPopup = document.querySelector('.popup_is-opened');
-    closeModal(openedPopup);
+    closeModal(editPopup);
 }
 
 // Слушатель отправки формы редактирования данных профиля
 formEdit.addEventListener('submit', handleFormProfileSubmit);
 
-
-// Сохранение новой карточки
-// Форма добавления новой карточки
-const formNewCard = addPopup.querySelector('.popup__form'); 
-// Находим поля формы добавления новой карточки
-const nameNewCard = formNewCard.querySelector('.popup__input_type_card-name'); 
-const linkNewCard = formNewCard.querySelector('.popup__input_type_url'); 
-
-// Обработчик «отправки» формы добавления новой карточки
-function handleFormNewCardSubmit(evt) {
-    evt.preventDefault(); 
-
-    const cards = {
-      name: nameNewCard.value,
-      link: linkNewCard.value,
-    } 
-
-    const cardObject = createCard(cards, deleteCard, openCard, likeCard);
-    cardList.prepend(cardObject);
-
-    const openedPopup = document.querySelector('.popup_is-opened');
-    closeModal(openedPopup);
-
-    formNewCard.reset();
-}
-
-// Слушатель отправки формы добавления новой карточки
-formNewCard.addEventListener('submit', handleFormNewCardSubmit);
 
 // Попап с увеличенной картинкой
 const imagePopup = document.querySelector('.popup_type_image');
@@ -119,9 +108,10 @@ const imagePopup = document.querySelector('.popup_type_image');
 const image = imagePopup.querySelector('.popup__image');
 const caption = imagePopup.querySelector('.popup__caption');
 
-//Функция открытя попапа с увеличенным изображением
+//Функция открытия попапа с увеличенным изображением
 function openCard (imageSrc, captionText) {
   image.src = imageSrc; 
+  image.alt = captionText;
   caption.textContent = captionText; 
   
   openModal(imagePopup);

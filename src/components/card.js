@@ -1,5 +1,3 @@
-import { openModal } from './modal.js';
-
 // @todo: Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content; 
 
@@ -9,9 +7,9 @@ export function createCard(cardItem, delFunction, openFunction, likeFunction) {
     const cardImage = cardElement.querySelector('.card__image');
     const cardCaption = cardElement.querySelector('.card__title');
     
-    cardImage.src = cardItem.link; //cardItem['link'];
-    cardImage.alt = cardItem.name; //cardItem['name'];
-    cardCaption.textContent = cardItem.name; //cardItem['name'];
+    cardImage.src = cardItem.link;
+    cardImage.alt = cardItem.name;
+    cardCaption.textContent = cardItem.name;
     
     const delButton = cardElement.querySelector('.card__delete-button');
     const likeButton = cardElement.querySelector('.card__like-button');
@@ -23,10 +21,10 @@ export function createCard(cardItem, delFunction, openFunction, likeFunction) {
       
     // Колбэк по клику на карточку
     cardImage.addEventListener('click', () => { 
-        openFunction(cardImage.src, cardCaption.textContent);
+        openFunction(cardItem.link, cardItem.name);
     });
-    //function(evt) {
-         
+    
+    // Слушатель кнопки лайка
     likeButton.addEventListener('click', likeFunction);
   
     return cardElement;
@@ -38,19 +36,6 @@ export function createCard(cardItem, delFunction, openFunction, likeFunction) {
   
     cardItemDel.remove();
   }
-
-  // export function openCard (cardImage, cardCaption) {
-  //   // Попап с увеличенной картинкой
-  //   const imagePopup = document.querySelector('.popup_type_image');
-  //   // Тэги в попапе с картинкой и заголовком 
-  //   const image = imagePopup.querySelector('.popup__image');
-  //   const caption = imagePopup.querySelector('.popup__caption');
-
-  //   image.src = cardImage.src;
-  //   caption.textContent = cardCaption.textContent;
-    
-  //   openModal(imagePopup);
-  // }
 
   export function likeCard () {
     event.target.classList.toggle('card__like-button_is-active');
