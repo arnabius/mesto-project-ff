@@ -17,3 +17,18 @@
     padding: 30px 20px;
   }
 }
+
+.input__content {
+  position: relative;
+  height: 1em;
+}
+
+.popup__content-avatar {
+  max-width: 430px;
+  width: 100%;
+  background-color: #fff;
+  border-radius: 10px;
+  position: relative;
+  box-sizing: border-box;
+  padding: 34px 36px;
+}

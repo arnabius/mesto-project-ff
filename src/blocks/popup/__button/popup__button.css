@@ -11,7 +11,7 @@
   border-radius: 2px;
   border: none;
   transition: visibility 0s, background 0.3s;
-  margin-top: 48px;
+  margin-top: 28px; /*48px;*/
 }
 
 .popup__button:hover {
@@ -24,4 +24,16 @@
     font-size: 14px;
     line-height: 17px;
   }
+}
+
+.popup__button_submit_inactive {
+  background: #fff;
+  border: 1px solid #000;
+  color: #000;
+  opacity: 0.2; 
+}
+
+.popup__button[disabled]:hover {
+  background: #fff;
+  cursor: default;
 }

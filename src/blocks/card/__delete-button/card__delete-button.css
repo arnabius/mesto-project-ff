@@ -21,3 +21,7 @@
 .card__delete-button:hover {
   opacity: 0.6;
 }
+
+.card__button-hidden {
+  display: none;
+}

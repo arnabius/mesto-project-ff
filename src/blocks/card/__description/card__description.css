@@ -5,3 +5,7 @@
   background: #fff;
   padding: 25px 20px;
 }
+
+.card__description-liked {
+  padding: 21px 20px 21px 20px;
+}
