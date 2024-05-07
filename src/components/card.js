@@ -1,4 +1,4 @@
-import { delCard, toggleLikeCard } from '../components/api.js'
+import { delCard, toggleLikeCard, checkStatus } from '../components/api.js'
 
 // Темплейт карточки
 const cardTemplate = document.querySelector('#card-template').content; 
@@ -36,7 +36,7 @@ export function createCard(cardItem, delFunction, openFunction, likeFunction, pr
   likeButton.addEventListener('click', likeFunction);
 
   // Есть ли на карточке мой лайк
-  const hasMyLike = cardItem.likes.some((item) => {  
+  const hasMyLike = cardItem.likes.some((item) => {
     return item._id === profile._id;
   });
 
@@ -46,7 +46,6 @@ export function createCard(cardItem, delFunction, openFunction, likeFunction, pr
   }
   // Проставим кол-ко лайков
   setLikeQuantityCard(cardElement, cardItem.likes.length);
-
 
   //// Колбэк по клику на карточку
   cardImage.addEventListener('click', () => { 
@@ -58,10 +57,12 @@ export function createCard(cardItem, delFunction, openFunction, likeFunction, pr
   
 // Функция удаления карточки
 export function deleteCard (event){
-  
   const cardItemDel = event.closest('.card');
 
   delCard(cardItemDel._id)
+  .then((res) => {
+    return checkStatus(res);
+  })
   .then((result) => {
     cardItemDel.remove();
   })
@@ -105,6 +106,9 @@ export function likeCard (event) {
   const isLike = (event.target.classList.contains('card__like-button_is-active')) ? false : true;
 
   toggleLikeCard(cardElement._id, isLike)
+  .then((res) => {
+    return checkStatus(res);
+  })
   .then((result) => {
     setLikeCard(cardElement);
     setLikeQuantityCard(cardElement, result.likes.length);

@@ -7,44 +7,22 @@ const config = {
 }
 
 
-
-// // Получение массива карточек
-// export function getCards () {
-//   return fetch(`${config.baseUrl}/cards`, {
-//     headers: config.headers
-//   })
-//   .then(res => {
-//     if (res.ok) {
-//       //return res.json();
-//       return Promise;
-//     }
-    
-
-//     // если ошибка, отклоняем промис
-//     return Promise.reject(`Ошибка: ${res.status}`);
-//   });
-// } 
-
-
-
-
+export function checkStatus (res) {
+  if (res.ok) {
+    return res.json();
+  }
+  // если ошибка, отклоняем промис
+  return Promise.reject(`Ошибка запроса по API: ${res.status}`);
+}
 
 // Получение массива карточек
 export function getInitialCards () {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка получения массива карточек: ${res.status}`);
-  });
 } 
 
-
-// Сохранение карточки карточек
+// Сохранение карточки 
 export function addNewCard (nameCard, linkCard) {
   return fetch(`${config.baseUrl}/cards`, {
     method: 'POST',
@@ -54,28 +32,13 @@ export function addNewCard (nameCard, linkCard) {
       link: linkCard
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка добавления карточки: ${res.status}`);
-  });
 }
-
 
 // Получение данных профиля
 export function getProfileInfo () {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка получения данных профиля: ${res.status}`);
-  });
 } 
 
 // Сохранение данных профиля
@@ -88,17 +51,7 @@ export function editProfile (nameInfo, aboutInfo) {
       about: aboutInfo
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка сохранения данных профиля: ${res.status}`);
-  });
 }
-
-
-
 
 // Сохранение данных аватара профиля
 export function editAvatarInfo (avatarInfo) {
@@ -109,16 +62,7 @@ export function editAvatarInfo (avatarInfo) {
       avatar: avatarInfo
     })
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка сохранения аватара профиля: ${res.status}`);
-  });
 }
-
-
 
 // Удаление карточки
 export function delCard (cardId) {
@@ -126,15 +70,7 @@ export function delCard (cardId) {
     method: 'DELETE',
     headers: config.headers
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка удаления карточки: ${res.status}`);
-  });
 } 
-
 
 // Постановка/удаление лайка
 export function toggleLikeCard (cardId, isLike) {
@@ -144,25 +80,6 @@ export function toggleLikeCard (cardId, isLike) {
     method: method,
     headers: config.headers
   })
-  .then(res => {
-    if (res.ok) {
-      return res.json();
-    }
-    // если ошибка, отклоняем промис
-    return Promise.reject(`Ошибка постановки/удаления лайка: ${res.status}`);
-  });
 } 
-
-
-// Отрисовка процесса сохранения
-export function renderLoading(isLoading, buttonElement) {
-  if (isLoading) {
-    buttonElement.oldTextContent = buttonElement.textContent;
-    buttonElement.textContent = 'Сохранение...';
-  }
-  else {
-    buttonElement.textContent = buttonElement.oldTextContent; //'Сохранить';
-  }
-}
 
 

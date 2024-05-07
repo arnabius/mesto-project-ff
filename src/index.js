@@ -2,35 +2,41 @@ import './pages/index.css'; // добавим импорт главного фа
 //import { initialCards } from './cards.js';
 import { createCard, deleteCard, likeCard } from './components/card.js';
 import { openModal, closeModal } from './components/modal.js';
-import { enableValidation, clearValidation } from './components/validation.js';
-import { getInitialCards, getProfileInfo, editProfile, editAvatarInfo, addNewCard, renderLoading } from './components/api.js'
-
-
-//// Получение данных профиля по API и вывод их на страницу
-getProfileInfo()
-.then((result) => {
-  setProfileInfo(result);
-})
-.catch((err) => {
-  console.log(err); // выводим ошибку в консоль
-});
-
+import { enableValidation, clearValidation, validationConfig } from './components/validation.js';
+import { getInitialCards, getProfileInfo, editProfile, editAvatarInfo, addNewCard, checkStatus } from './components/api.js'
+import { renderLoading } from './components/utils.js'
 
 //// Работа с карточками
 const cardList = document.querySelector('.places__list');
+const printError = (err) => console.log(err);
+// Глобальный объект с данными профиля
+const profileInfo = {};
 
-getInitialCards()
-.then((result) => {
+const handleInitialCards = (initialCards) => {
   // Выведем карточки на страницу
-  Array.from(result).forEach((card) => {
+  Array.from(initialCards).forEach((card) => {
     const cardObject = createCard(card, deleteCard, openCard, likeCard, profileInfo);
     cardList.append(cardObject);
   });
-})
-.catch((err) => {
-  console.log(err); // выводим ошибку в консоль
+}
+
+//// Получение данных профиля по API и вывод их на страницу
+const profileInfoPrimary  = getProfileInfo().then(res => {
+  return checkStatus(res);
 });
 
+//// Получение списка карточек по API
+const initialCardsPrimary = getInitialCards().then(res => {
+  return checkStatus(res);
+});
+
+Promise.all([ profileInfoPrimary, initialCardsPrimary ])
+.then(() => {
+  profileInfoPrimary.then((profileInfo) => {
+      setProfileInfo(profileInfo);
+      initialCardsPrimary.then(handleInitialCards, printError);
+  }, printError);
+}, printError);
 
 /////////////////////////////
 ////////////////////////////
@@ -45,7 +51,6 @@ popups.forEach(popup => {
     }
   });
 });
-
 
 /////////////////////////////
 // Кнопка "Добавить карточку"
@@ -62,6 +67,8 @@ const linkNewCard = formNewCard.querySelector('.popup__input_type_url');
 addButton.addEventListener('click', function (evt) {
   formNewCard.reset();
   openModal(addPopup);
+  // очистка ошибок валидации формы профиля
+  clearValidation(formNewCard, validationConfig);
 });
 
 // Сохранение новой карточки
@@ -74,10 +81,16 @@ function handleFormNewCardSubmit(evt) {
     renderLoading(true, buttonElement);
 
     addNewCard (nameNewCard.value, linkNewCard.value)
+    .then((res) => {
+      return checkStatus(res);
+    })
     .then((result) => {
       // Вывод карточки на страницу
       const cardObject = createCard(result, deleteCard, openCard, likeCard, profileInfo);
       cardList.prepend(cardObject);
+    })
+    .then ((result) => {
+      closeModal(addPopup);
     })
     .catch((err) => {
       console.log(err); // выводим ошибку в консоль
@@ -85,13 +98,10 @@ function handleFormNewCardSubmit(evt) {
     .finally(() => {
       renderLoading(false, buttonElement);
     }) ;
-
-    closeModal(addPopup);
 }
 
 // Слушатель отправки формы добавления новой карточки
 formNewCard.addEventListener('submit', handleFormNewCardSubmit);
-
 
 /////////////////////////////
 //////// Работа с профилем
@@ -120,24 +130,17 @@ const formEditAvatar = editAvatarPopup.querySelector('.popup__form');
 // Поле на форме для ввода ссылки на аватара
 const avatarInput = formEditAvatar.querySelector('.popup__input_type_url');
 
-// Глобальный объект с данными профиля
-const profileInfo = {};
-
 // Запись данных профиля на страницу
 function setProfileInfo(profile) {
-  // Вставим новые значения с помощью textContent
   elemProfileTitle.textContent = profile.name;
   elemProfileDescription.textContent = profile.about;
   profileAvatar.style.backgroundImage = `url(${profile.avatar})`;
-
+  
   profileInfo._id = profile._id;
   profileInfo.name = profile.name;
   profileInfo.about = profile.about;
   profileInfo.avatar = profile.avatar;
 }
-
-
-
 
 //// Редактирование профиля
 // Слушатель нажатия на кнопку редактирования профиля
@@ -149,7 +152,7 @@ editButton.addEventListener('click', function () {
   openModal(editPopup);
 
   // очистка ошибок валидации формы профиля
-  clearValidation(formEdit);
+  clearValidation(formEdit, validationConfig);
 });
 
 //// Сохранение данных профиля
@@ -165,20 +168,18 @@ function handleFormProfileSubmit(evt) {
   const job = jobInput.value;
 
   // Сохраним данные профиля
-  //editProfile (name, job);
-
-  // Вставим новые значения с помощью textContent
-  //elemProfileTitle.textContent = name; //nameInput.value;
-  //elemProfileDescription.textContent = job; //jobInput.value;
-
-  closeModal(editPopup);
-
   editProfile(name, job)
+  .then((res) => {
+    return checkStatus(res);
+  })
   .then((result) => {
     setProfileInfo(result);
   })
+  .then ((result) => {
+    closeModal(editPopup);
+  })
   .catch((err) => {
-    console.log(err); // выводим ошибку в консоль
+    console.log(err); // выводим ошибку в консоль   
   })
   .finally(() => {
     renderLoading(false, buttonElement);
@@ -191,14 +192,10 @@ formEdit.addEventListener('submit', handleFormProfileSubmit);
 //// Редактирование аватара профиля 
 // Слушатель нажатия на кнопку редактирования аватара
 profileAvatar.addEventListener('click', function () {
-  // Заполнение полей формы редактирования
-  //nameInput.value = elemProfileTitle.textContent;
-  //jobInput.value = elemProfileDescription.textContent;
-
   openModal(editAvatarPopup);
 
   // очистка ошибок валидации формы профиля
-  clearValidation(formEditAvatar);
+  clearValidation(formEditAvatar, validationConfig);
 });
 
 
@@ -212,11 +209,15 @@ function handleFormAvatarSubmit(evt) {
 
   renderLoading(true, buttonElement);
 
-  closeModal(editAvatarPopup);
-
   editAvatarInfo(avatarLink)
+  .then((res) => {
+    return checkStatus(res);
+  })
   .then((result) => {
     setProfileInfo(result);
+  })
+  .then ((result) => {
+    closeModal(editAvatarPopup);
   })
   .catch((err) => {
     console.log(err); // выводим ошибку в консоль
@@ -228,9 +229,6 @@ function handleFormAvatarSubmit(evt) {
 
 // Слушатель отправки формы редактирования аватара профиля
 formEditAvatar.addEventListener('submit', handleFormAvatarSubmit);
-
-
-
 
 /////////////////////////////
 // Попап с увеличенной картинкой
@@ -248,19 +246,5 @@ function openCard (imageSrc, captionText) {
   openModal(imagePopup);
 }
 
-
-
-///////////////////////////////////////////
-///////////////////////////////////////////
-///////////////////////////////////////////
-// Вызовем функцию
-enableValidation(); 
-
-
-
-
-
-
-
-
-
+// Вызовем функцию валидации
+enableValidation(validationConfig); 
