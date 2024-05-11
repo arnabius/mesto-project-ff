@@ -7,7 +7,7 @@ const config = {
 }
 
 
-export function checkStatus (res) {
+function checkStatus (res) {
   if (res.ok) {
     return res.json();
   }
@@ -20,6 +20,9 @@ export function getInitialCards () {
   return fetch(`${config.baseUrl}/cards`, {
     headers: config.headers
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 } 
 
 // Сохранение карточки 
@@ -32,6 +35,9 @@ export function addNewCard (nameCard, linkCard) {
       link: linkCard
     })
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 }
 
 // Получение данных профиля
@@ -39,6 +45,9 @@ export function getProfileInfo () {
   return fetch(`${config.baseUrl}/users/me`, {
     headers: config.headers
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 } 
 
 // Сохранение данных профиля
@@ -51,6 +60,9 @@ export function editProfile (nameInfo, aboutInfo) {
       about: aboutInfo
     })
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 }
 
 // Сохранение данных аватара профиля
@@ -62,6 +74,9 @@ export function editAvatarInfo (avatarInfo) {
       avatar: avatarInfo
     })
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 }
 
 // Удаление карточки
@@ -70,6 +85,9 @@ export function delCard (cardId) {
     method: 'DELETE',
     headers: config.headers
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 } 
 
 // Постановка/удаление лайка
@@ -80,6 +98,9 @@ export function toggleLikeCard (cardId, isLike) {
     method: method,
     headers: config.headers
   })
+  .then(res => {
+    return checkStatus(res);
+  }); 
 } 
 
 

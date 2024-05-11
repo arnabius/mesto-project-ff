@@ -60,9 +60,6 @@ export function deleteCard (event){
   const cardItemDel = event.closest('.card');
 
   delCard(cardItemDel._id)
-  .then((res) => {
-    return checkStatus(res);
-  })
   .then((result) => {
     cardItemDel.remove();
   })
@@ -106,9 +103,6 @@ export function likeCard (event) {
   const isLike = (event.target.classList.contains('card__like-button_is-active')) ? false : true;
 
   toggleLikeCard(cardElement._id, isLike)
-  .then((res) => {
-    return checkStatus(res);
-  })
   .then((result) => {
     setLikeCard(cardElement);
     setLikeQuantityCard(cardElement, result.likes.length);

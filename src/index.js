@@ -3,7 +3,7 @@ import './pages/index.css'; // добавим импорт главного фа
 import { createCard, deleteCard, likeCard } from './components/card.js';
 import { openModal, closeModal } from './components/modal.js';
 import { enableValidation, clearValidation, validationConfig } from './components/validation.js';
-import { getInitialCards, getProfileInfo, editProfile, editAvatarInfo, addNewCard, checkStatus } from './components/api.js'
+import { getInitialCards, getProfileInfo, editProfile, editAvatarInfo, addNewCard } from './components/api.js'
 import { renderLoading } from './components/utils.js'
 
 //// Работа с карточками
@@ -21,24 +21,19 @@ const handleInitialCards = (initialCards) => {
 }
 
 //// Получение данных профиля по API и вывод их на страницу
-const profileInfoPrimary  = getProfileInfo().then(res => {
-  return checkStatus(res);
-});
+//const profileInfoPrimary  = getProfileInfo(); 
 
 //// Получение списка карточек по API
-const initialCardsPrimary = getInitialCards().then(res => {
-  return checkStatus(res);
-});
+//const initialCardsPrimary = getInitialCards();
 
-Promise.all([ profileInfoPrimary, initialCardsPrimary ])
-.then(() => {
-  profileInfoPrimary.then((profileInfo) => {
-      setProfileInfo(profileInfo);
-      initialCardsPrimary.then(handleInitialCards, printError);
-  }, printError);
+Promise.all([ getProfileInfo(), getInitialCards() ])
+.then(([profileInfo, initialCards]) => {
+  setProfileInfo(profileInfo);
+  handleInitialCards(initialCards);
 }, printError);
 
-/////////////////////////////
+//////////////////
+///////////
 ////////////////////////////
 // Массив попап-окон
 const popups = Array.from(document.querySelectorAll('.popup'));
@@ -81,9 +76,6 @@ function handleFormNewCardSubmit(evt) {
     renderLoading(true, buttonElement);
 
     addNewCard (nameNewCard.value, linkNewCard.value)
-    .then((res) => {
-      return checkStatus(res);
-    })
     .then((result) => {
       // Вывод карточки на страницу
       const cardObject = createCard(result, deleteCard, openCard, likeCard, profileInfo);
@@ -169,9 +161,6 @@ function handleFormProfileSubmit(evt) {
 
   // Сохраним данные профиля
   editProfile(name, job)
-  .then((res) => {
-    return checkStatus(res);
-  })
   .then((result) => {
     setProfileInfo(result);
   })
@@ -210,9 +199,6 @@ function handleFormAvatarSubmit(evt) {
   renderLoading(true, buttonElement);
 
   editAvatarInfo(avatarLink)
-  .then((res) => {
-    return checkStatus(res);
-  })
   .then((result) => {
     setProfileInfo(result);
   })
